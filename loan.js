@@ -179,6 +179,39 @@ function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
     return net_income;
 }
 
+function _1build_report_table(name, header_array, table_array, counter=false) {
+    table = document.createElement('table'); 
+    table.classList.add('table');
+    table.setAttribute("id", name.replace(/ /g,"_"));
+    heading = document.createElement('th'); 
+    if (counter) {
+        th = document.createElement('th'); 
+        th.innerHTML = '#';
+        heading.appendChild(th);
+    }
+    header_array.forEach(function(head, h_index) {
+        th = document.createElement('th'); 
+        th.innerHTML = head[h_index];
+        heading.appendChild(th);
+    }
+    table.appendChild(heading);  
+    let row = 1;
+    header_array.forEach(function(row, r_index) {
+        tr = document.createElement('tr');
+        if (counter) {
+            td = document.createElement('td'); 
+            td.innerHTML = row;
+            tr.appendChild(td);
+            row++;
+        }
+        td = document.createElement('td');
+        td.innerHTML = row[r_index];
+        tr.appendChild(td);
+        table.appendChild(tr);
+    }
+    document.body.appendChild(table);
+}
+
 function _1product_report(array) {
     let table = document.getElementById('product_report');
     array.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
@@ -186,7 +219,7 @@ function _1product_report(array) {
     array.forEach(function(row, r_index) {
         tr = document.createElement('tr');
         td1 = document.createElement('td');
-        td1.innerHTML = count
+        td1.innerHTML = count;
         tr.appendChild(td1);
         td2 = document.createElement('td');
         td2.innerHTML = row[1];
@@ -275,6 +308,7 @@ function start_upload(e) {
             _1rank_report(G_portfolio_table);
             //console.log(G_product_table);
             _1product_report(G_product_table);
+            _1build_report_table('product report', ['Rank', 'Product', 'Profit', 'Q'], G_product_table);
         }
     };
     reader.readAsText(file);
