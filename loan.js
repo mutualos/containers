@@ -8,6 +8,18 @@ let USDollar = new Intl.NumberFormat('en-US', {
     currency: 'USD',
 });
 
+function verify_for_currency(obj) {
+    let USD = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+    if ( obj !== "" && !isNaN(obj) && Math.round(obj) != obj) {
+        return USD.format(obj);
+    } else {
+        return obj;
+    }
+}
+
 function encrypt_text(text_obj) {
     const encrypted = CryptoJS.AES.encrypt(text_obj, '<?= $client_phrase ?>');
     return encrypted;
@@ -183,83 +195,38 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
     table = document.createElement('table'); 
     table.classList.add('table');
     table.setAttribute("id", name.replace(/ /g,"_"));
-    heading = document.createElement('th'); 
+    heading = document.createElement('thead'); 
+    tr = document.createElement('tr'); 
     if (counter) {
         th = document.createElement('th'); 
         th.innerHTML = '#';
-        heading.appendChild(th);
+        tr.appendChild(th);
     }
     header_array.forEach(function(head, h_index) {
         th = document.createElement('th'); 
-        th.innerHTML = head[h_index];
-        heading.appendChild(th);
-    }
+        th.innerHTML = head;
+        tr.appendChild(th);
+    });
+    heading.appendChild(tr);
     table.appendChild(heading);  
-    let row = 1;
-    header_array.forEach(function(row, r_index) {
+    let count = 1;
+    table_array.forEach(function(row, r_index) {
         tr = document.createElement('tr');
         if (counter) {
             td = document.createElement('td'); 
-            td.innerHTML = row;
+            td.innerHTML = count;
             tr.appendChild(td);
-            row++;
+            count++;
         }
-        td = document.createElement('td');
-        td.innerHTML = row[r_index];
-        tr.appendChild(td);
+        for (column = 0; column < row.length; column++) {
+            td = document.createElement('td');
+            td.innerHTML = verify_for_currency(row[column]);
+            tr.appendChild(td);
+        }
         table.appendChild(tr);
-    }
-    document.body.appendChild(table);
-}
-
-function _1product_report(array) {
-    let table = document.getElementById('product_report');
-    array.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
-    let count = 1
-    array.forEach(function(row, r_index) {
-        tr = document.createElement('tr');
-        td1 = document.createElement('td');
-        td1.innerHTML = count;
-        tr.appendChild(td1);
-        td2 = document.createElement('td');
-        td2.innerHTML = row[1];
-        tr.appendChild(td2);
-        td3 = document.createElement('td');
-        td3.innerHTML = USDollar.format(row[2]);
-        tr.appendChild(td3);
-        table.appendChild(tr);
-        td4 = document.createElement('td');
-        td4.innerHTML = row[3];
-        tr.appendChild(td4);
-        table.appendChild(tr);
-        count++;
     });
+    document.getElementById('report_div').appendChild(table);
 }
-
-function _1rank_report(array) {
-    let table = document.getElementById('rank_report');
-    array.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
-    let count = 1
-    array.forEach(function(row, r_index) {
-        tr = document.createElement('tr');
-        td1 = document.createElement('td');
-        td1.innerHTML = count
-        tr.appendChild(td1);
-        td2 = document.createElement('td');
-        td2.innerHTML = row[0];
-        tr.appendChild(td2);
-        td3 = document.createElement('td');
-        td3.innerHTML = USDollar.format(row[1]);
-        tr.appendChild(td3);
-        table.appendChild(tr);
-        td4 = document.createElement('td');
-        td4.innerHTML = row[2];
-        tr.appendChild(td4);
-        table.appendChild(tr);
-        count++;
-    });
-}
-
 function start_upload(e) {
     e.preventDefault();
     var file = e.target.files[0];
@@ -305,10 +272,13 @@ function start_upload(e) {
                     G_product_table[temp_index][3] += 1;
                 }
             }
-            _1rank_report(G_portfolio_table);
-            //console.log(G_product_table);
-            _1product_report(G_product_table);
-            _1build_report_table('product report', ['Rank', 'Product', 'Profit', 'Q'], G_product_table);
+            //sort product report by profit 
+            G_product_table.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
+            _1build_report_table('product report', ['Type code', 'Product', 'Profit', 'Q'], G_product_table);
+            
+            //sort ranking report by profit
+            G_portfolio_table.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
+            _1build_report_table('ranking report', ['ID', 'Profit', 'Q'], G_portfolio_table, true);
         }
     };
     reader.readAsText(file);
