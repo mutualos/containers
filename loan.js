@@ -275,7 +275,7 @@ function start_upload(e) {
             let rows = file_content.split(/\r?\n|\r|\n/g);
             for (i=1; i < rows.length; i++) {  
                 let columns = rows[i].split(',');
-                let $principal = columns[header_.indexOf('principal')];
+                let $principal = parseFloat(columns[header_.indexOf('principal')]);
                 if ($principal != 0) {
                     if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
                     let $id = columns[header_.indexOf('ID')];
