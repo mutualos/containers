@@ -236,14 +236,15 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         table.appendChild(tr);
     });
     tr = document.createElement('tr');
-    for (column = 0; column < header_array.length; column++) {
-        td = document.createElement('td');
-        if (typeof sum[column] === 'undefined') {
-            td.innerHTML = '';
+    let leading_column = counter === true ? 1 : 0;
+    for (column = leading_column; column < header_array.length + leading_column; column++) {
+        th = document.createElement('th');
+        if (typeof sum[column - leading_column] === 'undefined') {
+            th.innerHTML = '';
         } else {
-            td.innerHTML = USDollar.format(sum[column]);
+            th.innerHTML = USDollar.format(sum[column - leading_column]);
         }
-        tr.appendChild(td);
+        tr.appendChild(th);
     }
     table.appendChild(tr);
     document.getElementById('report_div').appendChild(table);
@@ -274,7 +275,8 @@ function start_upload(e) {
             let rows = file_content.split(/\r?\n|\r|\n/g);
             for (i=1; i < rows.length; i++) {  
                 let columns = rows[i].split(',');
-                if (columns[header_.indexOf('principal')] != 0) {
+                let $principal = columns[header_.indexOf('principal')];
+                if ($principal != 0) {
                     if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
                     let $id = columns[header_.indexOf('ID')];
                     let $type = parseInt(columns[header_.indexOf('type')]);
@@ -291,12 +293,13 @@ function start_upload(e) {
                     temp_index = G_product_table.findIndex(function(v,i) {
                         return v[0] === $type});
                     G_product_table[temp_index][2] += loan_profit;
-                    G_product_table[temp_index][3] += 1;
+                    G_product_table[temp_index][3] += $principal;
+                    G_product_table[temp_index][4] += 1;
                 }
             }
             //sort product report by profit 
             G_product_table.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
-            _1build_report_table('product report', ['Type code', 'Product', 'Profit', 'Q'], G_product_table);
+            _1build_report_table('product report', ['Type code', 'Product', 'Profit', 'Principal', 'Q'], G_product_table);
             
             //sort ranking report by profit
             G_portfolio_table.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
