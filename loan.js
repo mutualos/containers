@@ -192,6 +192,7 @@ function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
 }
 
 function _1build_report_table(name, header_array, table_array, counter=false) {
+    let sum = [];
     table = document.createElement('table'); 
     table.classList.add('table');
     table.setAttribute("id", name.replace(/ /g,"_"));
@@ -220,13 +221,34 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         }
         for (column = 0; column < row.length; column++) {
             td = document.createElement('td');
-            td.innerHTML = verify_for_currency(row[column]);
+            if ( row[column] !== "" && !isNaN(row[column]) && Math.round(row[column]) != row[column]) {
+                td.innerHTML = USDollar.format(row[column]);
+                if (typeof sum[column] === 'undefined') {
+                    sum[column] = row[column];
+                } else {
+                    sum[column] += row[column];
+                }   
+            } else {
+                td.innerHTML = row[column];
+            }
             tr.appendChild(td);
         }
         table.appendChild(tr);
     });
+    tr = document.createElement('tr');
+    for (column = 0; column < header_array.length; column++) {
+        td = document.createElement('td');
+        if (typeof sum[column] === 'undefined') {
+            td.innerHTML = '';
+        } else {
+            td.innerHTML = USDollar.format(sum[column]);
+        }
+        tr.appendChild(td);
+    }
+    table.appendChild(tr);
     document.getElementById('report_div').appendChild(table);
 }
+
 function start_upload(e) {
     e.preventDefault();
     var file = e.target.files[0];
