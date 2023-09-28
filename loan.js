@@ -221,7 +221,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         }
         for (column = 0; column < row.length; column++) {
             td = document.createElement('td');
-            if ( row[column] !== "" && !isNaN(row[column]) {
+            if ( row[column] !== "" && !isNaN(row[column]) ) {
                 if (Math.round(row[column]) != row[column]) {
                     td.innerHTML = USDollar.format(row[column]);
                 } else {
