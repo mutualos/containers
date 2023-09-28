@@ -221,12 +221,16 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         }
         for (column = 0; column < row.length; column++) {
             td = document.createElement('td');
-            if ( row[column] !== "" && !isNaN(row[column]) && Math.round(row[column]) != row[column]) {
-                td.innerHTML = USDollar.format(row[column]);
+            if ( row[column] !== "" && !isNaN(row[column]) {
+                if (Math.round(row[column]) != row[column]) {
+                    td.innerHTML = USDollar.format(row[column]);
+                else {
+                    td.innerHTML = row[column];
+                }
                 if (typeof sum[column] === 'undefined') {
-                    sum[column] = row[column];
+                    sum[column+1] = row[column];
                 } else {
-                    sum[column] += row[column];
+                    sum[column+1] += row[column];
                 }   
             } else {
                 td.innerHTML = row[column];
@@ -239,10 +243,13 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
     let leading_column = counter === true ? 1 : 0;
     for (column = leading_column; column < header_array.length + leading_column; column++) {
         th = document.createElement('th');
-        if (typeof sum[column - leading_column] === 'undefined') {
+        column_sum = sum[column - leading_column];
+        if (typeof column_sum === 'undefined') {
             th.innerHTML = '';
+        } else if (Math.round(column_sum != column_sum) {
+            th.innerHTML = USDollar.format(column_sum);
         } else {
-            th.innerHTML = USDollar.format(sum[column - leading_column]);
+            th.innerHTML = column_sum;
         }
         tr.appendChild(th);
     }
