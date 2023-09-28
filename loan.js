@@ -224,7 +224,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
             if ( row[column] !== "" && !isNaN(row[column]) {
                 if (Math.round(row[column]) != row[column]) {
                     td.innerHTML = USDollar.format(row[column]);
-                else {
+                } else {
                     td.innerHTML = row[column];
                 }
                 if (typeof sum[column] === 'undefined') {
