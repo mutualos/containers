@@ -246,7 +246,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         column_sum = sum[column - leading_column];
         if (typeof column_sum === 'undefined') {
             th.innerHTML = '';
-        } else if (Math.round(column_sum != column_sum) {
+        } else if ( Math.round(column_sum != column_sum) ) {
             th.innerHTML = USDollar.format(column_sum);
         } else {
             th.innerHTML = column_sum;
