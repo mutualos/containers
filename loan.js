@@ -219,7 +219,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
             tr.appendChild(td);
             count++;
         }
-        for (column = 0; column < row.length; column++) {
+        for (column = 1; column < row.length; column++) {
             td = document.createElement('td');
             if ( row[column] !== "" && !isNaN(row[column]) ) {
                 if (Math.round(row[column]) != row[column]) {
@@ -240,16 +240,14 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         table.appendChild(tr);
     });
     tr = document.createElement('tr');
-    let leading_column = counter === true ? 1 : 0;
-    for (column = leading_column; column < header_array.length + leading_column; column++) {
+    for (column = 1; column < header_array.length; column++) {
         th = document.createElement('th');
-        column_sum = sum[column - leading_column];
-        if (typeof column_sum === 'undefined') {
+        if (typeof sum[column] === 'undefined') {
             th.innerHTML = '';
-        } else if ( Math.round(column_sum != column_sum) ) {
-            th.innerHTML = USDollar.format(column_sum);
+        } else if ( Math.round(sum[column] != sum[column]) ) {
+            th.innerHTML = USDollar.format(sum[column]);
         } else {
-            th.innerHTML = column_sum;
+            th.innerHTML = sum[column];
         }
         tr.appendChild(th);
     }
