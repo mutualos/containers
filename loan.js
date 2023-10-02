@@ -281,7 +281,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
 
 function _1catalog_data(columns, header_) {
     header_.forEach(function(column, c_index) {
-        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
+        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '<br>';
     });
 }
 
