@@ -8,18 +8,6 @@ let USDollar = new Intl.NumberFormat('en-US', {
     currency: 'USD',
 });
 
-function verify_for_currency(obj) {
-    let USD = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-    });
-    if ( obj !== "" && !isNaN(obj) && Math.round(obj) != obj) {
-        return USD.format(obj);
-    } else {
-        return obj;
-    }
-}
-
 function encrypt_text(text_obj) {
     const encrypted = CryptoJS.AES.encrypt(text_obj, '<?= $client_phrase ?>');
     return encrypted;
@@ -139,6 +127,7 @@ function _1fees(columns, header_) {
 }
 
 function _1reserve_expense(columns, header_) {
+    let id_filter = document.getElementById('id-filter').value.trim();
     let $type = columns[header_.indexOf('type')].trim();
     let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
     let type_map_ = <?= json_encode($container_config['type_map']) ?>;
@@ -147,12 +136,13 @@ function _1reserve_expense(columns, header_) {
     if (typeof type_map_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
-        let risk_adjustment = risk_rating_map_[$risk_rating];
-        let default_probability_ = default_map_[type_map_[$type][1]];
-        if (risk_adjustment == 'non-accrual') {
-            default_probability_ = 1;
+        if (risk_rating_map_[$risk_rating] == 'non-accrual') {
+            default_probability_ = 0;
+        } else if (typeof risk_rating_map_[$risk_rating] === 'undefined') { 
+            default_probability_ = default_map_[type_map_[$type][1]]; //no adjustment    
         } else {
-            default_probability_ *= risk_adjustment;
+            let risk_adjustment = parseInt(risk_rating_map_[$risk_rating]);
+            default_probability_ = default_map_[type_map_[$type][1]] * risk_adjustment;
         }
         let default_LTV_ = 0.80;
         let default_collateral_recovery_ = 0.50;
@@ -160,6 +150,9 @@ function _1reserve_expense(columns, header_) {
         let average_outstanding = _1average_outstanding(columns, header_);
         let operating_risk_minimum_ = <?= $container_config['operating_risk_minimum'] ?>;
         let reserve_expense = average_outstanding * operating_risk_minimum_  >  average_outstanding * exposure_at_default_ * default_probability_ ? average_outstanding * operating_risk_minimum_ : average_outstanding * exposure_at_default_ * default_probability_;
+        if (id_filter != null && id_filter != "") {
+            document.getElementById('file-content').textContent += "reserve expense : " + USDollar.format(reserve_expense) + '\n';   
+        }
         return reserve_expense;
     }
 }
@@ -281,7 +274,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
 
 function _1catalog_data(columns, header_) {
     header_.forEach(function(column, c_index) {
-        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '<br>';
+        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
     });
 }
 
@@ -304,7 +297,7 @@ function start_upload(e) {
             document.getElementById('file-errors').textContent = errors; 
         } else {
             header_ = <?= json_encode(array_values($container_config['fields'])) ?>;
-            //encrypt ID fields, if neccessary
+            //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
             //document.getElementById('file-content').textContent = encrypt_id(column_index, file_content);
             let rows = file_content.split(/\r?\n|\r|\n/g);
