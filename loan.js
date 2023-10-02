@@ -212,35 +212,36 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
     table.appendChild(heading);  
     let count = 1;
     table_array.forEach(function(row, r_index) {
-        tr = document.createElement('tr');
-        if (counter) {
-            td = document.createElement('td'); 
-            td.innerHTML = count;
-            tr.appendChild(td);
-            count++;
-        }
-        for (column = 0; column < row.length; column++) {
-            td = document.createElement('td');
-            if ( row[column] !== "" && !isNaN(row[column]) ) {
-                if (Math.round(row[column]) != row[column]) {
-                    td.innerHTML = USDollar.format(row[column]);
+        if (row[row.length-1] != 0) { //hack
+            tr = document.createElement('tr');
+            if (counter) {
+                td = document.createElement('td'); 
+                td.innerHTML = count;
+                tr.appendChild(td);
+                count++;
+            }
+            for (column = 0; column < row.length; column++) {
+                td = document.createElement('td');
+                if ( row[column] !== "" && !isNaN(row[column]) ) {
+                    if (Math.round(row[column]) != row[column]) {
+                        td.innerHTML = USDollar.format(row[column]);
+                    } else {
+                        td.innerHTML = row[column];
+                    }
+                    if (typeof sum[column] === 'undefined') {
+                        sum[column] = row[column];
+                    } else {
+                        sum[column] += row[column];
+                    }   
                 } else {
                     td.innerHTML = row[column];
                 }
-                if (typeof sum[column] === 'undefined') {
-                    sum[column] = row[column];
-                } else {
-                    sum[column] += row[column];
-                }   
-            } else {
-                td.innerHTML = row[column];
+                tr.appendChild(td);
             }
-            tr.appendChild(td);
+            table.appendChild(tr);
         }
-        table.appendChild(tr);
     });
     tr = document.createElement('tr');
-    
     if (counter) {
         th = document.createElement('th');
         th.innerHTML = '';
@@ -264,6 +265,12 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
     document.getElementById('report_div').appendChild(table);
 }
 
+function _1catalog_data(columns, header_) {
+    header_.forEach(function(column, c_index) {
+        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
+    });
+}
+
 function start_upload(e) {
     e.preventDefault();
     var file = e.target.files[0];
@@ -273,7 +280,7 @@ function start_upload(e) {
     var reader = new FileReader();
     reader.onload = function(e) {
         let file_content = e.target.result;
-        //validate file header-first row
+        let id_filter = document.getElementById('id-filter').value.trim();
         let CR = file_content.indexOf('\r');
         let LF = file_content.indexOf('\n');
         let header_end = LF > CR ? LF : CR;
@@ -291,24 +298,29 @@ function start_upload(e) {
                 let columns = rows[i].split(',');
                 let $principal = parseFloat(columns[header_.indexOf('principal')]);
                 if ($principal != 0) {
-                    if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
-                    let $id = columns[header_.indexOf('ID')];
-                    let $type = parseInt(columns[header_.indexOf('type')]);
-                    let loan_profit = parseFloat(_1loan_profit(columns, header_));
-                    //document.getElementById('screen-console').textContent += loan_profit + "\n";
-                    temp_index = G_portfolio_table.findIndex(function(v,i) {
-                        return v[0] == $id});
-                    if (temp_index === -1)  {
-                        G_portfolio_table.push([$id, loan_profit, 1]); 
-                    } else {
-                        G_portfolio_table[temp_index][1] += loan_profit;  
-                        G_portfolio_table[temp_index][2] += 1; 
+                    let $id = String(columns[header_.indexOf('ID')]).trim();
+                    if ($id == id_filter || id_filter == null || id_filter == "") {
+                        if (id_filter != null && id_filter != "") {
+                            _1catalog_data(columns, header_);    
+                        }
+                        //log warning
+                        if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
+                        let $type = parseInt(columns[header_.indexOf('type')]);
+                        let loan_profit = parseFloat(_1loan_profit(columns, header_));
+                        temp_index = G_portfolio_table.findIndex(function(v,i) {
+                            return v[0] == $id});
+                        if (temp_index === -1)  {
+                            G_portfolio_table.push([$id, loan_profit, 1]); 
+                        } else {
+                            G_portfolio_table[temp_index][1] += loan_profit;  
+                            G_portfolio_table[temp_index][2] += 1; 
+                        }
+                        temp_index = G_product_table.findIndex(function(v,i) {
+                            return v[0] === $type});
+                        G_product_table[temp_index][2] += loan_profit;
+                        G_product_table[temp_index][3] += $principal;
+                        G_product_table[temp_index][4] += 1;
                     }
-                    temp_index = G_product_table.findIndex(function(v,i) {
-                        return v[0] === $type});
-                    G_product_table[temp_index][2] += loan_profit;
-                    G_product_table[temp_index][3] += $principal;
-                    G_product_table[temp_index][4] += 1;
                 }
             }
             //sort product report by profit 
