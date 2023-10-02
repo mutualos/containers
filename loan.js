@@ -111,13 +111,19 @@ function _1cost_of_funds(columns, header_) {
 }
 
 function _1interest_income(columns, header_) {
-    $rate = columns[header_.indexOf('rate')];
-    if ($rate > 1 && $rate <= 100) {
-        $rate = $rate / 100;
-    } else if ($rate < .001 || $rate > 100)  {
-        return "rate out of range";
+    let risk_rating_map_ = <?= json_encode($container_config['risk_rating_map']) ?>;
+    let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
+    if (risk_rating_map_[$risk_rating] == 'non-accrual') {
+        return 0;
+    } else {
+        let $rate = columns[header_.indexOf('rate')];
+        if ($rate > 1 && $rate <= 100) {
+            $rate = $rate / 100;
+        } else if ($rate < .001 || $rate > 100)  {
+            return "rate out of range";
+        }
+        return _1average_outstanding(columns, header_) * $rate;
     }
-    return _1average_outstanding(columns, header_) * $rate;
 }
 
 function _1current_life_in_years(columns, header_) {
@@ -134,12 +140,20 @@ function _1fees(columns, header_) {
 
 function _1reserve_expense(columns, header_) {
     let $type = columns[header_.indexOf('type')].trim();
+    let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
     let type_map_ = <?= json_encode($container_config['type_map']) ?>;
-    let default_map_ = <?= json_encode($container_config['default_map']) ?>; //future this will be an array
+    let default_map_ = <?= json_encode($container_config['default_map']) ?>;
+    let risk_rating_map_ = <?= json_encode($container_config['risk_rating_map']) ?>;
     if (typeof type_map_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
+        let risk_adjustment = risk_rating_map_[$risk_rating];
         let default_probability_ = default_map_[type_map_[$type][1]];
+        if (risk_adjustment == 'non-accrual') {
+            default_probability_ = 1;
+        } else {
+            default_probability_ *= risk_adjustment;
+        }
         let default_LTV_ = 0.80;
         let default_collateral_recovery_ = 0.50;
         let exposure_at_default_ = 1 / default_LTV_ * default_collateral_recovery_;
