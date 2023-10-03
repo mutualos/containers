@@ -26,7 +26,7 @@ function validate_header(header) {
 }
 
 function displayContents(contents) {
-    var element = document.getElementById('file-content');
+    var element = document.getElementById('screen-console');
     element.textContent = contents;
 }
 
@@ -151,7 +151,7 @@ function _1reserve_expense(columns, header_) {
         let reserve_expense = average_outstanding * operating_risk_minimum_  >  average_outstanding * exposure_at_default_ * default_probability_ ? average_outstanding * operating_risk_minimum_ : average_outstanding * exposure_at_default_ * default_probability_;
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
-            document.getElementById('file-content').textContent += "reserve expense : " + USDollar.format(reserve_expense) + '\n';   
+            document.getElementById('screen-console').textContent += "reserve expense : " + USDollar.format(reserve_expense) + '\n';   
         }
         return reserve_expense;
     }
@@ -175,7 +175,7 @@ function _1operating_expense(columns, header_) {
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
-            document.getElementById('file-content').textContent += "operating expense : " + USDollar.format(operating_expense) + '\n';   
+            document.getElementById('screen-console').textContent += "operating expense : " + USDollar.format(operating_expense) + '\n';   
         }
         return operating_expense;
     }
@@ -279,7 +279,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
 
 function _1catalog_data(columns, header_) {
     header_.forEach(function(column, c_index) {
-        document.getElementById('file-content').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
+        document.getElementById('screen-console').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
     });
 }
 
@@ -304,7 +304,7 @@ function start_upload(e) {
             header_ = <?= json_encode(array_values($container_config['fields'])) ?>;
             //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
-            //document.getElementById('file-content').textContent = encrypt_id(column_index, file_content);
+            //document.getElementById('screen-console').textContent = encrypt_id(column_index, file_content);
             let rows = file_content.split(/\r?\n|\r|\n/g);
             for (i=1; i < rows.length; i++) {  
                 let columns = rows[i].split(',');
