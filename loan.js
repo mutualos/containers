@@ -337,7 +337,7 @@ function start_upload(e) {
             //sort ranking report by profit
             G_portfolio_table.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
             _1build_report_table('ranking report', ['ID', 'Profit', 'Q'], G_portfolio_table, true);
-            Modal_.fade();
+            Modal_.hide();
         }
     };
     reader.readAsText(file);
