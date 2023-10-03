@@ -60,6 +60,13 @@ function _1remaining_life_in_years(columns, header_) {
     return parseFloat(time_difference / (1000 * 60 * 60 * 24 * 365));  
 }
 
+function _1current_life_in_years(columns, header_) {
+    let $origination_date = new Date(columns[header_.indexOf('origination_date')]);  
+    let today = new Date();
+    let time_difference = today.getTime() - $origination_date.getTime();
+    return parseFloat(time_difference / (1000 * 60 * 60 * 24 * 365));  
+}
+
 function _1average_outstanding(columns, header_) {
     let $payment = parseFloat(columns[header_.indexOf('payment')]);
     let $principal_temp = parseFloat(columns[header_.indexOf('principal')]);
@@ -114,13 +121,6 @@ function _1interest_income(columns, header_) {
     }
 }
 
-function _1current_life_in_years(columns, header_) {
-    let $origination_date = new Date(columns[header_.indexOf('origination_date')]);  
-    let today = new Date();
-    let time_difference = today.getTime() - $origination_date.getTime();
-    return parseFloat(time_difference / (1000 * 60 * 60 * 24 * 365));  
-}
-
 function _1fees(columns, header_) {
     $fees = columns[header_.indexOf('fees')] / _1current_life_in_years(columns, header_);
     return $fees;
@@ -172,7 +172,7 @@ function _1operating_expense(columns, header_) {
         let m = (cost_factor - cost_factor * 2) / (cost_factor * 1000000);
         let origination = $principal * m + cost_factor * $principal / 100;
         let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
-        let operating_expense = parseFloat((origination + servicing) / Math.min(_1current_life_in_years(columns, header_), 5));
+        let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
             document.getElementById('file-content').textContent += "operating expense : " + USDollar.format(operating_expense) + '\n';   
