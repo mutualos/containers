@@ -16,7 +16,7 @@ function encrypt_text(text_obj) {
 function validate_header(header) {
     var header_errors = '';
     var columns = header.split(',');
-    config_headers = <?= json_encode(array_keys($container_config['fields'])) ?>;
+    config_headers = <?= json_encode(array_keys($container_config['file_field_map'])) ?>;
     for (i=0; i < config_headers.length; i++) {  
         if (!columns.includes(config_headers[i])) {
             header_errors += 'missing header column: ' + config_headers[i] + '\n';
@@ -296,7 +296,7 @@ function start_upload(e) {
         if (errors) {
             document.getElementById('file-errors').textContent = errors; 
         } else {
-            header_ = <?= json_encode(array_values($container_config['fields'])) ?>;
+            header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
             //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
             //document.getElementById('screen-console').textContent = encrypt_id(column_index, file_content);
