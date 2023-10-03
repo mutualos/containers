@@ -25,11 +25,6 @@ function validate_header(header) {
     return header_errors;
 }
 
-function displayContents(contents) {
-    var element = document.getElementById('screen-console');
-    element.textContent = contents;
-}
-
 function encrypt_id(id_column, file_content) {
     let rows = file_content.split(/\r?\n|\r|\n/g);
     for (i=1; i < rows.length; i++) {    
@@ -279,7 +274,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
 
 function _1catalog_data(columns, header_) {
     header_.forEach(function(column, c_index) {
-        document.getElementById('screen-console').textContent += column + " : " + columns[header_.indexOf(column)] + '\n';
+        document.getElementById('screen-console').innerHTML += column + " : " + columns[header_.indexOf(column)] + '\n';
     });
 }
 
