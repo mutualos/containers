@@ -124,19 +124,19 @@ function _1fees(columns, header_) {
 function _1reserve_expense(columns, header_) {
     let $type = columns[header_.indexOf('type')].trim();
     let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
-    let type_map_ = <?= json_encode($container_config['type_map']) ?>;
+    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
     let default_map_ = <?= json_encode($container_config['default_map']) ?>;
     let risk_rating_map_ = <?= json_encode($container_config['risk_rating_map']) ?>;
-    if (typeof type_map_[$type] === 'undefined') {
+    if (typeof loan_types_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
         if (risk_rating_map_[$risk_rating] == 'non-accrual') {
             default_probability_ = 0;
         } else if (typeof risk_rating_map_[$risk_rating] === 'undefined') { 
-            default_probability_ = default_map_[type_map_[$type][1]]; //no adjustment    
+            default_probability_ = default_map_[loan_types_[$type][1]]; //no adjustment    
         } else {
             let risk_adjustment = parseInt(risk_rating_map_[$risk_rating]);
-            default_probability_ = default_map_[type_map_[$type][1]] * risk_adjustment;
+            default_probability_ = default_map_[loan_types_[$type][1]] * risk_adjustment;
         }
         let default_LTV_ = 0.80;
         let default_collateral_recovery_ = 0.50;
@@ -158,12 +158,12 @@ function _1operating_expense(columns, header_) {
     let $principal = columns[header_.indexOf('principal')];
     let $type = columns[header_.indexOf('type')].trim();
     G_product_count[$type] += 1;
-    let type_map_ = <?= json_encode($container_config['type_map']) ?>;
-    if (typeof type_map_[$type] === 'undefined') {
+    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
+    if (typeof loan_types_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
         let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
-        let cost_factor = product_configuration_[type_map_[$type][1]][1];
+        let cost_factor = product_configuration_[loan_types_[$type][1]][1];
         let m = (cost_factor - cost_factor * 2) / (cost_factor * 1000000);
         let origination = $principal * m + cost_factor * $principal / 100;
         let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
@@ -178,9 +178,10 @@ function _1operating_expense(columns, header_) {
 
 function _1tax_expense(columns, header_, net_income) {
     let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
+    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
     let $type = columns[header_.indexOf('type')].trim();
     let tax_expense = 0;
-    if (typeof product_configuration_[type_map_[$type][1]][2] != 'undefined') {  //not tax exempt
+    if (typeof product_configuration_[loan_types_[$type][1]][2] != 'undefined') {  //not tax exempt
         let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
         tax_expense = parseFloat(tax_rate_) * net_income;     
     }
