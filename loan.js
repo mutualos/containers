@@ -1,8 +1,3 @@
-function encrypt_text(text_obj) {
-    const encrypted = CryptoJS.AES.encrypt(text_obj, '<?= $client_phrase ?>');
-    return encrypted;
-}
-
 function validate_header(header) {
     var header_errors = '';
     var columns = header.split(',');
@@ -13,22 +8,6 @@ function validate_header(header) {
         }
     }
     return header_errors;
-}
-
-function encrypt_id(id_column, file_content) {
-    let rows = file_content.split(/\r?\n|\r|\n/g);
-    for (i=1; i < rows.length; i++) {    
-        let columns = rows[i].split(',');
-        columns[id_column] = encrypt_text(columns[id_column]);
-        //trim spaces
-        for (j=0; j < columns.length; j++) {
-            if ( j != id_column) {
-                columns[j] = columns[j].trim();
-            }
-        }
-        rows[i] = columns.join(',');
-    }
-    return rows.join('\n');
 }
 
 function _1remaining_life_in_months(columns, header_) {
@@ -303,7 +282,7 @@ function start_upload(e) {
             header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
             //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
-            //document.getElementById('screen-console').textContent = encrypt_id(column_index, file_content);
+            //document.getElementById('screen-console').textContent = _1encrypt_id(column_index, file_content);
             let rows = file_content.split(/\r?\n|\r|\n/g);
             for (i=1; i < rows.length; i++) {  
                 let columns = rows[i].split(',');
@@ -317,6 +296,7 @@ function start_upload(e) {
                         //log warning
                         if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
                         let $type = parseInt(columns[header_.indexOf('type')]);
+                        let $branch = columns[header_.indexOf('branch')];
                         let loan_profit = parseFloat(_1loan_profit(columns, header_));
                         temp_index = G_portfolio_table.findIndex(function(v,i) {
                             return v[0] == $id});
@@ -331,16 +311,28 @@ function start_upload(e) {
                         G_product_table[temp_index][2] += loan_profit;
                         G_product_table[temp_index][3] += $principal;
                         G_product_table[temp_index][4] += 1;
+                        
+                        temp_index = G_branch_table.findIndex(function(v,i) {
+                            return v[0] === $branch});
+                        G_branch_table[temp_index][2] += loan_profit;
+                        G_branch_table[temp_index][3] += $principal;
+                        G_branch_table[temp_index][4] += 1;
                     }
                 }
             }
             //sort product report by profit 
             G_product_table.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
             _1build_report_table('product report', ['Type code', 'Product', 'Profit', 'Principal', 'Q'], G_product_table);
+
+            //sort branch report by profit 
+            G_branch_table.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
+            _1build_report_table('Branch report', ['Branch', 'Product', 'Profit', 'Principal', 'Q'], G_branch_table);
             
             //sort ranking report by profit
             G_portfolio_table.sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
             _1build_report_table('ranking report', ['ID', 'Profit', 'Q'], G_portfolio_table, true);
+
+            
             Modal_.hide();
         }
     };
