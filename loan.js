@@ -1,13 +1,3 @@
-//globals 
-var G_product_count = <?= json_encode($loan_counts) ?>;
-var G_portfolio_table = [];
-var G_product_table = <?= json_encode($product_table) ?>;
-
-let USDollar = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-});
-
 function encrypt_text(text_obj) {
     const encrypted = CryptoJS.AES.encrypt(text_obj, '<?= $client_phrase ?>');
     return encrypted;
@@ -146,7 +136,7 @@ function _1reserve_expense(columns, header_) {
         let reserve_expense = average_outstanding * operating_risk_minimum_  >  average_outstanding * exposure_at_default_ * default_probability_ ? average_outstanding * operating_risk_minimum_ : average_outstanding * exposure_at_default_ * default_probability_;
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
-            document.getElementById('screen-console').textContent += "reserve expense : " + USDollar.format(reserve_expense) + '\n';   
+            document.getElementById('screen-console').textContent += "reserve expense : " + USDollar_.format(reserve_expense) + '\n';   
         }
         return reserve_expense;
     }
@@ -170,7 +160,7 @@ function _1operating_expense(columns, header_) {
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
-            document.getElementById('screen-console').textContent += "operating expense : " + USDollar.format(operating_expense) + '\n';   
+            document.getElementById('screen-console').textContent += "operating expense : " + USDollar_.format(operating_expense) + '\n';   
         }
         return operating_expense;
     }
@@ -181,13 +171,13 @@ function _1tax_expense(columns, header_, net_income) {
     let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
     let $type = columns[header_.indexOf('type')].trim();
     let tax_expense = 0;
-    if (typeof product_configuration_[loan_types_[$type][1]][2] != 'undefined') {  //not tax exempt
+    if (typeof product_configuration_[loan_types_[$type][1]][2] == 'undefined') {  //not tax exempt
         let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
         tax_expense = parseFloat(tax_rate_) * net_income;     
     }
     let id_filter = document.getElementById('id-filter').value.trim();
     if (id_filter != null && id_filter != "") {
-        document.getElementById('screen-console').textContent += "tax expense : " + USDollar.format(tax_expense) + '\n';   
+        document.getElementById('screen-console').textContent += "tax expense : " + USDollar_.format(tax_expense) + '\n';   
     }
     return parseFloat(tax_expense);
 }
@@ -245,7 +235,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
                 td = document.createElement('td');
                 if ( row[column] !== "" && !isNaN(row[column]) ) {
                     if (Math.round(row[column]) != row[column]) {
-                        td.innerHTML = USDollar.format(row[column]);
+                        td.innerHTML = USDollar_.format(row[column]);
                     } else {
                         td.innerHTML = row[column];
                     }
@@ -276,7 +266,7 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         if (typeof sum[column] === 'undefined') {
             th.innerHTML = '';
         } else if ( Math.round(sum[column]) != sum[column] ) {
-            th.innerHTML = USDollar.format(sum[column]);
+            th.innerHTML = USDollar_.format(sum[column]);
         } else {
             th.innerHTML = sum[column];
         }
