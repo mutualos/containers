@@ -155,15 +155,15 @@ function _1reserve_expense(columns, header_) {
 function _1operating_expense(columns, header_) {
     //version 1 -- origination principal factor adjusted by institution's efficiency
     //y-intercept
-    $principal = columns[header_.indexOf('principal')];
-    $type = columns[header_.indexOf('type')].trim();
+    let $principal = columns[header_.indexOf('principal')];
+    let $type = columns[header_.indexOf('type')].trim();
     G_product_count[$type] += 1;
     let type_map_ = <?= json_encode($container_config['type_map']) ?>;
     if (typeof type_map_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
-        let product_map_ = <?= json_encode($container_config['product_map']) ?>;
-        let cost_factor = product_map_[type_map_[$type][1]][1];
+        let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
+        let cost_factor = product_configuration_[type_map_[$type][1]][1];
         let m = (cost_factor - cost_factor * 2) / (cost_factor * 1000000);
         let origination = $principal * m + cost_factor * $principal / 100;
         let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
@@ -176,6 +176,21 @@ function _1operating_expense(columns, header_) {
     }
 }
 
+function _1tax_expense(columns, header_, net_income) {
+    let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
+    let $type = columns[header_.indexOf('type')].trim();
+    let tax_expense = 0;
+    if (typeof product_configuration_[type_map_[$type][1]][2] != 'undefined') {  //not tax exempt
+        let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
+        tax_expense = parseFloat(tax_rate_) * net_income;     
+    }
+    let id_filter = document.getElementById('id-filter').value.trim();
+    if (id_filter != null && id_filter != "") {
+        document.getElementById('screen-console').textContent += "tax expense : " + USDollar.format(tax_expense) + '\n';   
+    }
+    return parseFloat(tax_expense);
+}
+
 function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
     let interest_income = _1interest_income(columns, header_);
     if (typeof interest_income === 'string') return 'error 1: ' + interest_income; 
@@ -185,9 +200,7 @@ function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
     let operating_expense = _1operating_expense(columns, header_);
     if (typeof operating_expense === 'string') return 'error 3: ' + operating_expense;
     let net_income = interest_income + fees - operating_expense - cost_of_funds;
-    let tax_rate_ = <?= $container_config['tax_rate'] ?>;
-    let tax_expense = tax_rate_ * net_income;
-    net_income -= tax_expense;
+    net_income -= _1tax_expense(columns, header_, net_income);
     //let reserve_expense = _1reserve_expense(row);
     //let net_income = (interest_income + fees - operating_expense - funding_expense) * (1 + tax_rate) - reserve_expense;
     //net_income = operating_expense;
