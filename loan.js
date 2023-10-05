@@ -296,7 +296,7 @@ function start_upload(e) {
                         //log warning
                         if( _1current_life_in_years(columns, header_) > 20 ) console.log(columns[header_.indexOf('principal')]);
                         let $type = parseInt(columns[header_.indexOf('type')]);
-                        let $branch = columns[header_.indexOf('branch')];
+                        let $branch = columns[header_.indexOf('branch')].trim();
                         let loan_profit = parseFloat(_1loan_profit(columns, header_));
                         temp_index = G_portfolio_table.findIndex(function(v,i) {
                             return v[0] == $id});
