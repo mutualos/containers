@@ -178,6 +178,10 @@ function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
     if (typeof reserve_expense === 'string') return 'error 3: ' + reserve_expense;
     net_income -= reserve_expense;
     if (isNaN(net_income)) console.log(header_, columns, _1interest_income(columns, header_), _1fees(columns, header_), _1cost_of_funds(columns, header_), _1operating_expense(columns, header_), _1reserve_expense(columns, header_), _1average_outstanding(columns, header_), $type = columns[header_.indexOf('type')].trim() );
+    let id_filter = document.getElementById('id-filter').value.trim();
+    if (id_filter != null && id_filter != "") {
+        document.getElementById('screen-console').textContent += "net income : " + USDollar_.format(net_income) + '\n';   
+    }
     return net_income;
 }
 
