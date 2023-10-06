@@ -39,9 +39,12 @@ function _1current_life_in_years(columns, header_) {
 }
 
 function _1average_outstanding(columns, header_) {
-    let $payment = parseFloat(columns[header_.indexOf('payment')]);
     let $principal_temp = parseFloat(columns[header_.indexOf('principal')]);
     let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
+    let $payment = parseFloat(columns[header_.indexOf('payment')]);
+    if ($payment < $principal_temp * $monthly_rate) {
+        $payment = _1estimate_payment(columns, header_);
+    }
     let $months = Math.max(Math.min(_1remaining_life_in_months(columns, header_), 360), 1);
     let principal_sum = 0;
     let month = 0;
@@ -77,10 +80,10 @@ function _1estimate_payment(columns, header_) {
 }
 
 function _1cost_of_funds(columns, header_) {
-    let $payment = parseFloat(columns[header_.indexOf('payment')]);
     let $principal_temp = parseFloat(columns[header_.indexOf('principal')]);
     let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
-    if ($payment == 0 || $payment < $principal_temp * $monthly_rate) {
+    let $payment = parseFloat(columns[header_.indexOf('payment')]);
+    if ($payment < $principal_temp * $monthly_rate) {
         $payment = _1estimate_payment(columns, header_);
     }
     let $months = Math.max(Math.min(_1remaining_life_in_months(columns, header_), 360), 1);
