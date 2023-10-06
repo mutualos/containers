@@ -96,7 +96,7 @@ function _1cost_of_funds(columns, header_) {
     }
     let cost_of_funds = COF_sum / $months;
     _screen_log("cost of funds", USDollar_.format(cost_of_funds)); 
-    let line_cost_of_funds = parseFloat(parseFloat(columns[header_.indexOf('principal')]) * COFR_map_[0] / 100);
+    let line_cost_of_funds = parseFloat(parseFloat(columns[header_.indexOf('principal')]) * COFR_map_[1] / 100);
     _screen_log("line cost of funds", USDollar_.format(line_cost_of_funds)); 
     return cost_of_funds;
 }
