@@ -81,12 +81,15 @@ function _1interest_income(columns, header_) {
         } else if ($rate < .001 || $rate > 100)  {
             return "rate out of range";
         }
-        return _1average_outstanding(columns, header_) * $rate;
+        interest_income = _1average_outstanding(columns, header_) * $rate;
+        _screen_log("interest income", USDollar_.format(interest_income));
+        return interest_income;
     }
 }
 
 function _1fees(columns, header_) {
     $fees = columns[header_.indexOf('fees')] / _1current_life_in_years(columns, header_);
+    _screen_log("fees", USDollar_.format($fees));
     return $fees;
 }
 
