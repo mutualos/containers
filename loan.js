@@ -54,6 +54,7 @@ function _1average_outstanding(columns, header_) {
     if (average_outstanding < 0) {
         console.log('warning: average outstanding below zero', header_, columns);
     }
+    _screen_log("average outstanding", USDollar_.format(average_outstanding)); 
     return average_outstanding;
 }
 
