@@ -66,7 +66,9 @@ function _1cost_of_funds(columns, header_) {
         $principal_temp -= paydown
         month++;
     }
-    return COF_sum / $months;
+    let cost_of_funds = COF_sum / $months;
+    _screen_log("cost of funds", USDollar_.format(cost_of_funds));    
+    return cost_of_funds;
 }
 
 function _1interest_income(columns, header_) {
