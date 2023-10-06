@@ -10,6 +10,13 @@ function validate_header(header) {
     return header_errors;
 }
 
+function _1term_in_months(columns, header_) {
+    let $maturity_date = new Date(columns[header_.indexOf('maturity_date')]);
+    let $origination_date = new Date(columns[header_.indexOf('origination_date')]); 
+    let time_difference = $maturity_date.getTime() - $origination_date.getTime();
+    return parseInt(time_difference / (1000 * 60 * 60 * 24 * 30));  
+}
+
 function _1remaining_life_in_months(columns, header_) {
     let $maturity_date = new Date(columns[header_.indexOf('maturity_date')]); 
     let today = new Date();
@@ -50,6 +57,15 @@ function _1average_outstanding(columns, header_) {
     return average_outstanding;
 }
 
+function _1monthly_payment(columns, header_) {
+    let $principal = parseFloat(columns[header_.indexOf('principal')]);
+    let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
+    let months = _1term_in_months(columns, header_);
+    let payment = $principal * $monthly_rate * (Math.pow(1 + $monthly_rate, months)) / (Math.pow(1 + $monthly_rate, months) - 1);
+    _screen_log("calculated payment", USDollar_.format(payment)); 
+    return payment; 
+}
+
 function _1cost_of_funds(columns, header_) {
     let $payment = parseFloat(columns[header_.indexOf('payment')]);
     let $principal_temp = parseFloat(columns[header_.indexOf('principal')]);
@@ -62,12 +78,12 @@ function _1cost_of_funds(columns, header_) {
     let COF_sum = 0;
     while (month <= $months && $principal_temp > 0) {
         paydown = $payment - ($principal_temp * $monthly_rate);
-        _screen_log("cost of funds SUM", USDollar_.format(COF_sum)); //debug
         COF_sum += paydown * COFR_map_[month] / 100 * month;
         $principal_temp -= paydown
         month++;
     }
     let cost_of_funds = COF_sum / $months;
+    let payment = _1monthly_payment(columns, header_);
     _screen_log("cost of funds", USDollar_.format(cost_of_funds));    
     return cost_of_funds;
 }
