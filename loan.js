@@ -157,10 +157,8 @@ function _1tax_expense(columns, header_, net_income) {
         let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
         tax_expense = Math.abs(parseFloat(tax_rate_) * net_income);     
     }
-    let id_filter = document.getElementById('id-filter').value.trim();
-    if (id_filter != null && id_filter != "") {
-        document.getElementById('screen-console').textContent += "tax expense : " + USDollar_.format(tax_expense) + '\n';   
-    }
+    _screen_log("pre-tax net income", USDollar_.format(net_income));
+    _screen_log("tax expense", USDollar_.format(tax_expense));
     return parseFloat(tax_expense);
 }
 
