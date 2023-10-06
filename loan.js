@@ -77,6 +77,9 @@ function _1estimate_payment(columns, header_) {
 
 function _1cost_of_funds(columns, header_) {
     let $payment = parseFloat(columns[header_.indexOf('payment')]);
+    if ($payment == 0) {
+        $payment = _1estimate_payment(columns, header_);
+    }
     let $principal_temp = parseFloat(columns[header_.indexOf('principal')]);
     let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
     let $months = Math.max(Math.min(_1remaining_life_in_months(columns, header_), 360), 1);
@@ -92,8 +95,9 @@ function _1cost_of_funds(columns, header_) {
         month++;
     }
     let cost_of_funds = COF_sum / $months;
-    let payment = _1estimate_payment(columns, header_);
-    _screen_log("cost of funds", USDollar_.format(cost_of_funds));    
+    _screen_log("cost of funds", USDollar_.format(cost_of_funds)); 
+    let line_cost_of_funds = parseFloat(parseFloat(columns[header_.indexOf('principal')]) * COFR_map_[0] / 100);
+    _screen_log("line cost of funds", USDollar_.format(line_cost_of_funds)); 
     return cost_of_funds;
 }
 
