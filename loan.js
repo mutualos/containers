@@ -152,7 +152,7 @@ function _1tax_expense(columns, header_, net_income) {
     let tax_expense = 0;
     if (typeof product_configuration_[loan_types_[$type][1]][2] == 'undefined') {  //not tax exempt
         let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
-        tax_expense = parseFloat(tax_rate_) * net_income;     
+        tax_expense = Math.abs(parseFloat(tax_rate_) * net_income);     
     }
     let id_filter = document.getElementById('id-filter').value.trim();
     if (id_filter != null && id_filter != "") {
