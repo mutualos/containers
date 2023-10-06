@@ -62,6 +62,7 @@ function _1cost_of_funds(columns, header_) {
     let COF_sum = 0;
     while (month <= $months && $principal_temp > 0) {
         paydown = $payment - ($principal_temp * $monthly_rate);
+        _screen_log("cost of funds SUM", USDollar_.format(COF_sum)); //debug
         COF_sum += paydown * COFR_map_[month] / 100 * month;
         $principal_temp -= paydown
         month++;
