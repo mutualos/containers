@@ -21,7 +21,7 @@ function _1remaining_life_in_months(columns, header_) {
     let $maturity_date = new Date(columns[header_.indexOf('maturity_date')]); 
     let today = new Date();
     let time_difference = $maturity_date.getTime() - today.getTime();
-    return parseInt(time_difference / (1000 * 60 * 60 * 24 * 30));  
+    return Math.min(1, parseInt(time_difference / (1000 * 60 * 60 * 24 * 30)));  
 }
 
 function _1remaining_life_in_years(columns, header_) {
