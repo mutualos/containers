@@ -14,7 +14,7 @@ function _1term_in_months(columns, header_) {
     let $maturity_date = new Date(columns[header_.indexOf('maturity_date')]);
     let $origination_date = new Date(columns[header_.indexOf('origination_date')]); 
     let time_difference = $maturity_date.getTime() - $origination_date.getTime();
-    return parseInt(time_difference / (1000 * 60 * 60 * 24 * 30));  
+    return Math.max(1, parseInt(time_difference / (1000 * 60 * 60 * 24 * 30)));  
 }
 
 function _1remaining_life_in_months(columns, header_) {
@@ -74,7 +74,6 @@ function _1estimate_payment(columns, header_) {
     let $principal = parseFloat(columns[header_.indexOf('principal')]);
     let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
     let months = _1remaining_life_in_months(columns, header_);
-    _screen_log("est months", months);
     let payment = $principal * $monthly_rate * (Math.pow(1 + $monthly_rate, months)) / (Math.pow(1 + $monthly_rate, months) - 1);
     _screen_log("estimated payment", USDollar_.format(payment)); 
     return payment; 
