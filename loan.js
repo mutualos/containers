@@ -74,6 +74,7 @@ function _1estimate_payment(columns, header_) {
     let $principal = parseFloat(columns[header_.indexOf('principal')]);
     let $monthly_rate = parseFloat(columns[header_.indexOf('rate')]) / 12;
     let months = _1remaining_life_in_months(columns, header_);
+    _screen_log("est months", USDollar_.format(months));
     let payment = $principal * $monthly_rate * (Math.pow(1 + $monthly_rate, months)) / (Math.pow(1 + $monthly_rate, months) - 1);
     _screen_log("estimated payment", USDollar_.format(payment)); 
     return payment; 
