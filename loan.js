@@ -224,7 +224,8 @@ function _1loan_profit(columns, header_)  {  //version 1 denoted by _1
 
 function _1build_report_table(name, header_array, table_array, counter=false) {
     let sum = [];
-    table = document.createElement('table'); 
+    let id_column = -1;
+    let table = document.createElement('table'); 
     table.classList.add('table');
     table.setAttribute("id", name.replace(/ /g,"_"));
     heading = document.createElement('thead'); 
@@ -235,6 +236,9 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
         tr.appendChild(th);
     }
     header_array.forEach(function(head, h_index) {
+        if (head == 'ID') {
+            id_column = h_index; 
+        }
         th = document.createElement('th'); 
         th.innerHTML = head;
         tr.appendChild(th);
@@ -253,6 +257,9 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
             }
             for (column = 0; column < row.length; column++) {
                 td = document.createElement('td');
+                if (column == id_column) {
+                    td.id = row[column];
+                }
                 if ( row[column] !== "" && !isNaN(row[column]) ) {
                     if (Math.round(row[column]) != row[column]) {
                         td.innerHTML = USDollar_.format(row[column]);
