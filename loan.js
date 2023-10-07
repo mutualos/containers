@@ -174,7 +174,7 @@ function _1operating_expense(columns, header_) {
         let cost_factor = product_configuration_[loan_types_[$type][1]][1];
         let m = (cost_factor - cost_factor * 2) / (cost_factor * 1000000);
         let origination = $principal * m + cost_factor * $principal / 100;
-        let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
+        let servicing = $principal * <?= $container_config['servicing_expense_factor'] ?>;
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
