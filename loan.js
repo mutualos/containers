@@ -178,6 +178,7 @@ function _1operating_expense(columns, header_) {
         _screen_log("servicing expense", USDollar_.format(servicing_expense));
         let operating_expense = origination_expense + servicing_expense;
         _screen_log("operating expense", USDollar_.format(operating_expense));
+        _screen_log("debug", Math.max(_1current_life_in_years(columns, header_), 5));
         return operating_expense;
     }
 }
