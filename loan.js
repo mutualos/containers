@@ -161,8 +161,6 @@ function _1reserve_expense(columns, header_) {
 }
 
 function _1operating_expense(columns, header_) {
-    //version 1 -- origination principal factor adjusted by institution's efficiency
-    //y-intercept
     let $principal = columns[header_.indexOf('principal')];
     let $type = columns[header_.indexOf('type')].trim();
     G_product_count[$type] += 1;
@@ -170,27 +168,24 @@ function _1operating_expense(columns, header_) {
     if (typeof loan_types_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
-        let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
-        let cost_factor = product_configuration_[loan_types_[$type][1]][1];
-        let m = (cost_factor - cost_factor * 2) / (cost_factor * 1000000);
-        let origination = $principal * m + cost_factor * $principal / 100;
+        let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
+        let cost_factor_ = product_configuration_[loan_types_[$type][1]][1];
+        let efficiency_ratio_ = Math.float(<?= json_encode($container_config['institution_efficiency']) ?>);
+        let origination = cost_factor_ * $principal * efficiency_ratio_ / 100;
         let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
-        let id_filter = document.getElementById('id-filter').value.trim();
-        if (id_filter != null && id_filter != "") {
-            document.getElementById('screen-console').textContent += "operating expense : " + USDollar_.format(operating_expense) + '\n';   
-        }
+        _screen_log("operating expense", USDollar_.format(operating_expense));
         return operating_expense;
     }
 }
 
 function _1tax_expense(columns, header_, net_income) {
-    let product_configuration_ = <?= json_encode($container_config['inst_product_configuration']) ?>;
+    let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
     let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
     let $type = columns[header_.indexOf('type')].trim();
     let tax_expense = 0;
     if (typeof product_configuration_[loan_types_[$type][1]][2] == 'undefined') {  //not tax exempt
-        let tax_rate_ = <?= $container_config['inst_tax_rate'] ?>;
+        let tax_rate_ = <?= $container_config['institution_tax_rate'] ?>;
         tax_expense = Math.abs(parseFloat(tax_rate_) * net_income);     
     }
     _screen_log("pre-tax net income", USDollar_.format(net_income));
