@@ -169,10 +169,11 @@ function _1operating_expense(columns, header_) {
         return 'type ' + $type + ' missing from config map';
     } else {
         let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
-        let cost_factor_ = product_configuration_[loan_types_[$type][1]][1];
+        let cost_factor_ = parseFloat(product_configuration_[loan_types_[$type][1]][1]);
+        let principal_cap = Math.min(parseFloat(product_configuration_[loan_types_[$type][1]][2]), $principal);
         let efficiency_ratio_ = parseFloat(<?= json_encode($container_config['institution_efficiency']) ?>);
-        let origination = cost_factor_ * $principal * efficiency_ratio_ / 100;
-        let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
+        let origination = cost_factor_ * principal_cap * efficiency_ratio_ / 100;
+        let servicing = principal_cap * <?= $container_config['servicing_factor'] ?>;
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
         _screen_log("operating expense", USDollar_.format(operating_expense));
         return operating_expense;
@@ -184,7 +185,7 @@ function _1tax_expense(columns, header_, net_income) {
     let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
     let $type = columns[header_.indexOf('type')].trim();
     let tax_expense = 0;
-    if (typeof product_configuration_[loan_types_[$type][1]][2] == 'undefined') {  //not tax exempt
+    if (typeof product_configuration_[loan_types_[$type][1]][3] == 'undefined') {  //not tax exempt
         let tax_rate_ = <?= $container_config['institution_tax_rate'] ?>;
         tax_expense = Math.abs(parseFloat(tax_rate_) * net_income);     
     }
