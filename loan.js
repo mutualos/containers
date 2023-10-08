@@ -170,7 +170,7 @@ function _1operating_expense(columns, header_) {
     } else {
         let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
         let cost_factor_ = product_configuration_[loan_types_[$type][1]][1];
-        let efficiency_ratio_ = Math.float(<?= json_encode($container_config['institution_efficiency']) ?>);
+        let efficiency_ratio_ = parseFloat(<?= json_encode($container_config['institution_efficiency']) ?>);
         let origination = cost_factor_ * $principal * efficiency_ratio_ / 100;
         let servicing = $principal * <?= $container_config['servicing_factor'] ?>;
         let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
