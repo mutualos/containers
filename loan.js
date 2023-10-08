@@ -172,10 +172,11 @@ function _1operating_expense(columns, header_) {
         let cost_factor_ = parseFloat(product_configuration_[loan_types_[$type][1]][1]);
         let principal_cap = Math.min(parseFloat(product_configuration_[loan_types_[$type][1]][2]), $principal);
         let efficiency_ratio_ = parseFloat(<?= json_encode($container_config['institution_efficiency']) ?>);
-        _screen_log("principal cap", USDollar_.format(principal_cap));
-        let origination = cost_factor_ * principal_cap * efficiency_ratio_ / 100;
-        let servicing = principal_cap * <?= $container_config['servicing_factor'] ?>;
-        let operating_expense = parseFloat((origination + servicing) / Math.max(_1current_life_in_years(columns, header_), 5));
+        let origination_expense = cost_factor_ * principal_cap * efficiency_ratio_ * .01 / Math.max(_1current_life_in_years(columns, header_), 5);
+        _screen_log("origination expense", USDollar_.format(origination_expense));
+        let servicing_expense = principal_cap * parseFloat(<?= $container_config['servicing_factor'] ?>) / Math.max(_1current_life_in_years(columns, header_), 5);
+        _screen_log("servicing expense", USDollar_.format(servicing_expense));
+        let operating_expense = origination_expense + servicing_expense;
         _screen_log("operating expense", USDollar_.format(operating_expense));
         return operating_expense;
     }
