@@ -257,8 +257,8 @@ function _1build_report_table(name, header_array, table_array, counter=false) {
                 td = document.createElement('td');
                 if (column == id_column) {
                     td.id = row[column];
-                }
-                if ( row[column] !== "" && !isNaN(row[column]) ) {
+                    td.innerHTML = _encryptString(row[column]);
+                } else if ( row[column] !== "" && !isNaN(row[column]) ) {
                     if (Math.round(row[column]) != row[column]) {
                         td.innerHTML = USDollar_.format(row[column]);
                     } else {
