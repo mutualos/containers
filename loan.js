@@ -87,7 +87,7 @@ function _1cost_of_funds(columns, header_) {
         $payment = _1estimate_payment(columns, header_);
     }
     let $months = Math.max(Math.min(_1remaining_life_in_months(columns, header_), 360), 1);
-    let COFR_map_ = <?= json_encode($curve_array) ?>;
+    let COFR_map_ = document.getElementById('treasury_curve_').value.trim();
     let principal_sum = 0;
     let paydown = 0;
     let month = 1;
