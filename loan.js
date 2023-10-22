@@ -1,10 +1,11 @@
 function validate_header(header) {
-    var header_errors = '';
-    var columns = header.split(',');
-    config_headers = <?= json_encode(array_keys($container_config['file_field_map'])) ?>;
-    for (i=0; i < config_headers.length; i++) {  
-        if (!columns.includes(config_headers[i])) {
-            header_errors += 'missing header column: ' + config_headers[i] + '\n';
+    let header_errors = '';
+    let columns = header.split(',');
+    //config_headers = <?= json_encode(array_keys($container_config['file_field_map'])) ?>;
+    let config_headers_ = JSON.parse(document.getElementById('file_field_map_').innerHTML).keys();
+    for (i=0; i < config_headers_.length; i++) {  
+        if (!columns.includes(config_headers_[i])) {
+            header_errors += 'missing header column: ' + config_headers_[i] + '\n';
         }
     }
     return header_errors;
@@ -164,17 +165,17 @@ function _1operating_expense(columns, header_) {
     let $principal = columns[header_.indexOf('principal')];
     let $type = columns[header_.indexOf('type')].trim();
     G_product_count[$type] += 1;
-    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
+    let loan_types_ = JSON.parse(document.getElementById('loan_types_').innerHTML);
     if (typeof loan_types_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
-        let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
+        let product_configuration_ = JSON.parse(document.getElementById('institution_product_configuration_').innerHTML);
         let cost_factor_ = parseFloat(product_configuration_[loan_types_[$type][1]][1]);
         let principal_cap = Math.min(parseFloat(product_configuration_[loan_types_[$type][1]][2]), $principal);
-        let efficiency_ratio_ = parseFloat(<?= json_encode($container_config['institution_efficiency']) ?>);
+        let efficiency_ratio_ = parseFloat(document.getElementById('institution_efficiency_').innerHTML);
         let origination_expense = cost_factor_ * principal_cap * efficiency_ratio_ * .01 / Math.max(_1current_life_in_years(columns, header_), 5);
         _screen_log("origination expense", USDollar_.format(origination_expense));
-        let servicing_expense = principal_cap * parseFloat(<?= $container_config['servicing_factor'] ?>) / Math.max(_1current_life_in_years(columns, header_), 5);
+        let servicing_expense = principal_cap * parseFloat(document.getElementById('servicing_factor_').innerHTML) / Math.max(_1current_life_in_years(columns, header_), 5);
         _screen_log("servicing expense", USDollar_.format(servicing_expense));
         let operating_expense = origination_expense + servicing_expense;
         _screen_log("operating expense", USDollar_.format(operating_expense));
@@ -183,13 +184,13 @@ function _1operating_expense(columns, header_) {
 }
 
 function _1tax_expense(columns, header_, net_income) {
-    let product_configuration_ = <?= json_encode($container_config['institution_product_configuration']) ?>;
-    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
+    let product_configuration_ = JSON.parse(document.getElementById('institution_product_configuration_').innerHTML);
+    let loan_types_ = JSON.parse(document.getElementById('loan_types_').innerHTML);
     let $type = columns[header_.indexOf('type')].trim();
     let tax_expense = 0;
     if (typeof product_configuration_[loan_types_[$type][1]][3] == 'undefined') {  //not tax exempt
-        let tax_rate_ = <?= $container_config['institution_tax_rate'] ?>;
-        tax_expense = Math.abs(parseFloat(tax_rate_) * net_income);     
+        let tax_rate_ = parseFloat(document.getElementById('institution_tax_rate_').innerHTML);
+        tax_expense = Math.abs(tax_rate_ * net_income);     
     }
     _screen_log("pre-tax net income", USDollar_.format(net_income));
     _screen_log("tax expense", USDollar_.format(tax_expense));
