@@ -106,7 +106,7 @@ function _1cost_of_funds(columns, header_) {
 }
 
 function _1interest_income(columns, header_) {
-    let risk_rating_map_ = <?= json_encode($container_config['risk_rating_map']) ?>;
+    let risk_rating_map_ = JSON.parse(document.getElementById('risk_rating_map_').innerHTML);
     let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
     if (risk_rating_map_[$risk_rating] == 'non-accrual') {
         return 0;
@@ -132,9 +132,9 @@ function _1fees(columns, header_) {
 function _1reserve_expense(columns, header_) {
     let $type = columns[header_.indexOf('type')].trim();
     let $risk_rating = columns[header_.indexOf('risk_rating')].trim();
-    let loan_types_ = <?= json_encode($container_config['loan_types']) ?>;
-    let default_map_ = <?= json_encode($container_config['default_map']) ?>;
-    let risk_rating_map_ = <?= json_encode($container_config['risk_rating_map']) ?>;
+    let loan_types_ = JSON.parse(document.getElementById('loan_types_').innerHTML);
+    let default_map_ = JSON.parse(document.getElementById('default_map_').innerHTML);
+    let risk_rating_map_ = JSON.parse(document.getElementById('risk_rating_map_').innerHTML);
     if (typeof loan_types_[$type] === 'undefined') {
         return 'type ' + $type + ' missing from config map';
     } else {
@@ -150,7 +150,7 @@ function _1reserve_expense(columns, header_) {
         let default_collateral_recovery_ = 0.50;
         let exposure_at_default_ = 1 / default_LTV_ * default_collateral_recovery_;
         let average_outstanding = _1average_outstanding(columns, header_);
-        let operating_risk_minimum_ = <?= $container_config['operating_risk_minimum'] ?>;
+        let operating_risk_minimum_ = parseFloat(document.getElementById('operating_risk_minimum_').innerHTML);
         let reserve_expense = average_outstanding * operating_risk_minimum_  >  average_outstanding * exposure_at_default_ * default_probability_ ? average_outstanding * operating_risk_minimum_ : average_outstanding * exposure_at_default_ * default_probability_;
         let id_filter = document.getElementById('id-filter').value.trim();
         if (id_filter != null && id_filter != "") {
