@@ -1,8 +1,7 @@
 function validate_header(header) {
     let header_errors = '';
     let columns = header.split(',');
-    //config_headers = <?= json_encode(array_keys($container_config['file_field_map'])) ?>;
-    let config_headers_ = JSON.parse(document.getElementById('file_field_map_').innerHTML).keys();
+    let config_headers_ = Object.keys(JSON.parse(document.getElementById('file_field_map_').innerHTML));
     for (i=0; i < config_headers_.length; i++) {  
         if (!columns.includes(config_headers_[i])) {
             header_errors += 'missing header column: ' + config_headers_[i] + '\n';
@@ -326,7 +325,8 @@ function start_upload(e) {
         if (errors) {
             document.getElementById('file-errors').textContent = errors; 
         } else {
-            header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
+            //header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
+            header_ = Object.keys(JSON.parse(document.getElementById('file_field_map_').innerHTML));
             //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
             //document.getElementById('screen-console').textContent = _1encrypt_id(column_index, file_content);
