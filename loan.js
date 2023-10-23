@@ -325,8 +325,8 @@ function start_upload(e) {
         if (errors) {
             document.getElementById('file-errors').textContent = errors; 
         } else {
-            //header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
-            header_ = Object.keys(JSON.parse(document.getElementById('file_field_map_').innerHTML));
+            header_ = <?= json_encode(array_values($container_config['file_field_map'])) ?>;
+            //header_ = Object.keys(JSON.parse(document.getElementById('file_field_map_').innerHTML));
             //encrypt ID fields, if necessary
             //let column_index = header_.indexOf('ID');
             //document.getElementById('screen-console').textContent = _1encrypt_id(column_index, file_content);
